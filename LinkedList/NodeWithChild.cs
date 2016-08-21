@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace LinkedList
 {
-    public class Node<T>
+    public class NodeWithChild<T>
     {
         public T Value { get; set; }
 
-        public Node(T value)
+        public NodeWithChild(T value)
         {
             Value = value;
         }
 
         public Node<T> Next { get; set; }
 
-        public Node<T> Previous { get; set; }
+        public Node<T> Child { get; set; }
     }
 }

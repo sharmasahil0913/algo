@@ -6,17 +6,18 @@ using System.Threading.Tasks;
 
 namespace LinkedList
 {
-    public class Node<T>
+    public class NodeRandom<T>
     {
         public T Value { get; set; }
 
-        public Node(T value)
+        public NodeRandom(T value)
         {
             Value = value;
         }
 
-        public Node<T> Next { get; set; }
+        public NodeRandom<T> Next { get; set; }
 
-        public Node<T> Previous { get; set; }
+        public NodeRandom<T> Random { get; set; }
+
     }
 }

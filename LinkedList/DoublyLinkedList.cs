@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace LinkedList
 {
-    public class DoublyLinkedList<T> : IEnumerable<DoublyLinkedListNode<T>>, ICollection<T>
+    public class DoublyLinkedList<T> : IEnumerable<Node<T>>, ICollection<T>
     {
-        public DoublyLinkedListNode<T> First { get; private set; }
-        public DoublyLinkedListNode<T> Last { get; private set; }
+        public Node<T> First { get; private set; }
+        public Node<T> Last { get; private set; }
 
-        public void AddFirst(DoublyLinkedListNode<T> newNode)
+        public void AddFirst(Node<T> newNode)
         {
             if (newNode != null)
             {
@@ -33,10 +33,10 @@ namespace LinkedList
 
         public void AddFirst(T newValue)
         {
-            AddFirst(new DoublyLinkedListNode<T>(newValue));
+            AddFirst(new Node<T>(newValue));
         }
 
-        public void AddLast(DoublyLinkedListNode<T> newNode)
+        public void AddLast(Node<T> newNode)
         {
             if (newNode != null)
             {
@@ -58,14 +58,14 @@ namespace LinkedList
 
         public void AddLast(T newValue)
         {
-            AddLast(new DoublyLinkedListNode<T>(newValue));
+            AddLast(new Node<T>(newValue));
         }
 
-        public DoublyLinkedListNode<T> RemoveFirst()
+        public Node<T> RemoveFirst()
         {
             if (First != null)
             {
-                DoublyLinkedListNode<T> firstNode = First;
+                Node<T> firstNode = First;
                 First = First.Next;
                 if (First != null)
                 {
@@ -81,11 +81,11 @@ namespace LinkedList
             return null;
         }
 
-        public DoublyLinkedListNode<T> RemoveLast()
+        public Node<T> RemoveLast()
         {
             if (Last != null)
             {
-                DoublyLinkedListNode<T> lastNode = Last;
+                Node<T> lastNode = Last;
                 Last = Last.Previous;
                 if (Last != null)
                 {
@@ -101,7 +101,7 @@ namespace LinkedList
             return null;
         }
 
-        public bool Remove(DoublyLinkedListNode<T> newNode)
+        public bool Remove(Node<T> newNode)
         {
             if (newNode != null)
             {
@@ -118,9 +118,9 @@ namespace LinkedList
         //    throw new NotImplementedException();
         //}
 
-        public DoublyLinkedListNode<T> Find(T value)
+        public Node<T> Find(T value)
         {
-            DoublyLinkedListNode<T> current = First;
+            Node<T> current = First;
 
             while (current != null)
             {
@@ -133,11 +133,11 @@ namespace LinkedList
             return null;
         }
 
-        public DoublyLinkedListNode<T> FindLast(T value)
+        public Node<T> FindLast(T value)
         {
             //One and best way is to use same as "DoublyLinkedListNode<T> Find(T value)" except assign Last to current.
-            DoublyLinkedListNode<T> current = First;
-            DoublyLinkedListNode<T> element = null;
+            Node<T> current = First;
+            Node<T> element = null;
 
             while (current != null)
             {
@@ -184,7 +184,7 @@ namespace LinkedList
 
         public bool Remove(T item)
         {
-            DoublyLinkedListNode<T> node = Find(item);
+            Node<T> node = Find(item);
             if (node != null)
             {
                 if (node.Previous != null)
@@ -213,7 +213,7 @@ namespace LinkedList
 
 
         //IEnumerable starts
-        public IEnumerator<DoublyLinkedListNode<T>> GetEnumerator()
+        public IEnumerator<Node<T>> GetEnumerator()
         {
             throw new NotImplementedException();
         }
@@ -228,6 +228,295 @@ namespace LinkedList
             throw new NotImplementedException();
         }
         //IEnumerable ends
+
+
+
+        //Geeks For Geeks > 100 comments problems starts here
+
+        public Node<T> GetNthNode(int n, Node<T> first) // Node<T> GetNthNode(Node<T> first, int n)
+        {
+            for (int i = 0; i < n-1 && first != null; i++)
+            {
+                first = first.Next;
+            }
+
+            return first;
+        }
+
+        public void DeleteNodeThroughPointerSinglyLL(ref Node<T> node)
+        {
+            if (node != null)
+            {
+                if (node.Next != null)
+                {
+                    node.Value = node.Next.Value;
+                }
+                else
+                {
+                    node = null;
+                }
+            }
+        }
+
+        public Node<T> GetMiddleNode(Node<T> first) //Node<T> GetMiddleNode(Node<T> first)
+        {
+            int count = GetCount(first);
+
+            for (int i = 0; i < (count-1)/2; i++)
+            {
+                first = first.Next;
+            }
+            return first;
+        }
+
+        public int GetCount(Node<T> first)
+        {
+            int count = 0;
+            while (first!=null)
+            {
+                count++;
+                first = first.Next;
+            }
+            return count;
+        }
+
+        public Node<T> GetNthNodeFromLast(int n, Node<T> first) //Node<T> GetNthNodeFromLast(Node<T> first, int n)
+        {
+            int count = GetCount(first);
+            return GetNthNode(count - n + 1, first);
+        }
+
+        public void DeleteLinkedList(ref Node<T> first)
+        {
+            Node<T> current = first;
+            Node<T> save;
+            while (current!=null && current.Next!=null)
+            {
+                save = current.Next;
+                current.Next = null;
+                current = save;
+            }
+            first = null;
+        }
+
+        public void Reverse(Node<T> node)
+        {
+            Node<T> reversedFirst = null;
+            Node<T> save;
+            while (node != null)
+            {
+                save = node.Next;
+                node.Next = reversedFirst;
+                reversedFirst = node;
+                node = save;
+            }
+        }
+
+        public Node<T> IsLoopPresent(Node<T> node)
+        {
+            HashSet<Node<T>> hashSet = new HashSet<Node<T>>();
+            while (node != null)
+            {
+                if (hashSet.Contains(node))
+                {
+                    return node;
+                }
+                else
+                {
+                    hashSet.Add(node);
+                }
+                node = node.Next;
+            }
+            return null;
+        }
+
+        public bool IsSinglyLLPalindrome(Node<T> first)
+        {
+            Node<T> middle = GetMiddleNode(first);
+            if (middle != null)
+            {
+                middle = middle.Next;
+            }
+
+            while (first!=null && middle!=null)
+            {
+                if (first.Value.Equals(middle.Value))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public NodeRandom<T> Clone(NodeRandom<T> node)
+        {
+            NodeRandom<T> firstNode = node;
+            NodeRandom<T> newNode = null;
+            NodeRandom<T> lastNodeCopy = null;
+            NodeRandom<T> firstNodeCopy = null;
+            NodeRandom<T> save = null;
+
+            while (node != null)
+            {
+                newNode = new NodeRandom<T>(node.Value);
+
+                if (lastNodeCopy!=null)
+                {
+                    lastNodeCopy.Next = newNode;
+                }
+                else
+                {
+                    firstNodeCopy = newNode;
+                }
+                lastNodeCopy = newNode;
+
+                save = node.Next;
+                node.Next = newNode;
+                lastNodeCopy.Random = node;
+                node = save;
+            }
+
+            NodeRandom<T> iteratorOriginal = firstNode;
+            NodeRandom<T> iteratorCopy = firstNodeCopy;
+
+            while (iteratorCopy != null)
+            {
+                if (iteratorCopy.Random.Random != null)
+                {
+                    iteratorCopy.Random = iteratorCopy.Random.Random.Next;
+                }
+                else
+                {
+                    iteratorCopy.Random = null;
+                }
+
+                if (iteratorOriginal.Next.Next != null)
+                {
+                    iteratorOriginal.Next = iteratorOriginal.Next.Next.Random;
+                }
+                else
+                {
+                    iteratorOriginal.Next = null;
+                }
+
+                iteratorOriginal = iteratorOriginal.Next;
+                iteratorCopy = iteratorCopy.Next;
+            }
+            return firstNodeCopy;
+        }
+
+        public Node<T> GetIntersetion(Node<T> node1, Node<T> node2)
+        {
+            HashSet<Node<T>> hashset = new HashSet<Node<T>>();
+
+            while (node1 != null)
+            {
+                hashset.Add(node1);
+                node1 = node1.Next;
+            }
+
+            while (node2 != null)
+            {
+                if (hashset.Contains(node2))
+                {
+                    return node2;
+                }
+                else
+                {
+                    hashset.Add(node2);
+                }
+                node2 = node2.Next;
+            }
+            return null;
+        }
+
+        public void RemoveDuplicatesSortedList(Node<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveDuplicates(Node<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PairwiseSwap(Node<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Node<T> GetIntersectionSortedList(Node<T> node1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AlternateSplit(Node<T> node, Node<T> first, Node<T> second)
+        {
+            throw new NotImplementedException();
+        }
+
+        //-------------------------------------To do 15/08/2016
+        //-------------------------------------Read stanford notes.
+        public Node<T> MergeSortedLL(Node<T> first, Node<T> second)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void MergeSort(Node<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReverseLLInGroups(Node<T> node, int k)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteNodesWithGreaterValueOnRight(Node<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EvenNumberFirstLL(Node<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DetectAndRemoveLoop(Node<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Node<T> Add(Node<T> first, Node<T> second)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Sort012LL(Node<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FlattenMultiLevelList(NodeWithChild<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PairwiseSwapByChangingLinks(Node<T> node) //useful when too many data fields to copy
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReverseAlternateAppendEnd(Node<T> node)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+
+        //2 left as related to trees ll combination
+        //Geeks For Geeks > 100 comments problems ends here
 
 
     }
