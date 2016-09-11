@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace LinkedList
 {
-    public class DoublyLinkedList<T> : IEnumerable<Node<T>>, ICollection<T>
+    public class DoublyLinkedList<T> : IEnumerable<Node<T>>, ICollection<T> where T :IComparable
     {
-        public Node<T> First { get; private set; }
-        public Node<T> Last { get; private set; }
+        public Node<T> First { get;  set; }
+        public Node<T> Last { get;  set; }
 
         public void AddFirst(Node<T> newNode)
         {
@@ -204,6 +204,12 @@ namespace LinkedList
                         node.Next.Previous = node;
                     }
                 }
+
+                //Missed case: added after unit test failed. (if not class based we need to pass first and last pointers with ref)
+                if (node.Next == null && node.Previous == null)
+                {
+                    First = null;Last = null;
+                }
                 return true;
             }
             return false;
@@ -235,6 +241,11 @@ namespace LinkedList
 
         public Node<T> GetNthNode(int n, Node<T> first) // Node<T> GetNthNode(Node<T> first, int n)
         {
+            if (n == 0) //added after unit test writing. otherwise first returned.
+            {
+                return null;
+            }
+
             for (int i = 0; i < n-1 && first != null; i++)
             {
                 first = first.Next;
@@ -250,6 +261,7 @@ namespace LinkedList
                 if (node.Next != null)
                 {
                     node.Value = node.Next.Value;
+                    node.Next = node.Next.Next; //added after unit test
                 }
                 else
                 {
@@ -299,17 +311,19 @@ namespace LinkedList
             first = null;
         }
 
-        public void Reverse(Node<T> node)
+        public void Reverse(ref Node<T> node)//added ref after unit tests
         {
+            Node<T> nodePtr = node;//added after unit test
             Node<T> reversedFirst = null;
             Node<T> save;
-            while (node != null)
+            while (nodePtr != null)
             {
-                save = node.Next;
-                node.Next = reversedFirst;
-                reversedFirst = node;
-                node = save;
+                save = nodePtr.Next;
+                nodePtr.Next = reversedFirst;
+                reversedFirst = nodePtr;
+                nodePtr = save;
             }
+            node = reversedFirst;//added after unit test
         }
 
         public Node<T> IsLoopPresent(Node<T> node)
@@ -348,7 +362,7 @@ namespace LinkedList
             return true;
         }
 
-        public NodeRandom<T> Clone(NodeRandom<T> node)
+        public static NodeRandom<T> Clone(NodeRandom<T> node)
         {
             NodeRandom<T> firstNode = node;
             NodeRandom<T> newNode = null;
@@ -405,7 +419,14 @@ namespace LinkedList
             return firstNodeCopy;
         }
 
-        public Node<T> GetIntersetion(Node<T> node1, Node<T> node2)
+        /// <summary>
+        /// Todo: Check how hashset comparison works here
+        /// Better solution by not using this hashset
+        /// </summary>
+        /// <param name="node1"></param>
+        /// <param name="node2"></param>
+        /// <returns></returns>
+        public static Node<T> GetIntersetion(Node<T> node1, Node<T> node2)
         {
             HashSet<Node<T>> hashset = new HashSet<Node<T>>();
 
@@ -414,7 +435,7 @@ namespace LinkedList
                 hashset.Add(node1);
                 node1 = node1.Next;
             }
-
+            
             while (node2 != null)
             {
                 if (hashset.Contains(node2))
@@ -432,12 +453,39 @@ namespace LinkedList
 
         public void RemoveDuplicatesSortedList(Node<T> node)
         {
-            throw new NotImplementedException();
+            while (node != null && node.Next != null)
+            {
+                if (node.Value.Equals(node.Next.Value))
+                {
+                    node.Next = node.Next.Next;
+                }
+                else
+                {
+                    node = node.Next;
+                }
+            }
         }
 
-        public void RemoveDuplicates(Node<T> node)
+        public void RemoveDuplicates(Node<T> node) //Todo check when T is non-int to check how comparison done for complex type
         {
-            throw new NotImplementedException();
+            if (node==null)
+            {
+                return;
+            }
+            HashSet<T> hashSet = new HashSet<T>();
+            hashSet.Add(node.Value);
+            while (node.Next != null)
+            {
+                if (!hashSet.Contains(node.Next.Value))
+                {
+                    hashSet.Add(node.Next.Value);
+                    node = node.Next;
+                }
+                else
+                {
+                    node.Next = node.Next.Next;
+                }
+            }
         }
 
         public void PairwiseSwap(Node<T> node)
@@ -445,31 +493,155 @@ namespace LinkedList
             throw new NotImplementedException();
         }
 
-        public Node<T> GetIntersectionSortedList(Node<T> node1)
+        public Node<T> GetIntersectionSortedList(Node<T> node1, Node<T> node2)
         {
-            throw new NotImplementedException();
+            HashSet<Node<T>> hashSet = new HashSet<Node<T>>();
+            while (node1 != null)
+            {
+                hashSet.Add(node1);
+                node1 = node1.Next;
+            }
+
+            while (node2!=null)
+            {
+                if (hashSet.Contains(node2))
+                {
+                    return node2;
+                }
+                node2 = node2.Next;
+            }
+            return null;
         }
 
-        public void AlternateSplit(Node<T> node, Node<T> first, Node<T> second)
+        //changed to ref input while writing unit test
+        //check why we need ref and out
+        public void AlternateSplit(Node<T> node, out Node<T> first, out Node<T> second)
         {
             throw new NotImplementedException();
         }
 
         //-------------------------------------To do 15/08/2016
         //-------------------------------------Read stanford notes.
-        public Node<T> MergeSortedLL(Node<T> first, Node<T> second)
+        public static Node<T> MergeSortedLL(Node<T> first, Node<T> second)
         {
-            throw new NotImplementedException();
+            Node<T> result = null, tail = null;
+
+            if (first == null)
+            {
+                return second;
+            }
+            if (second == null)
+            {
+                return first;
+            }
+            while (first != null && second != null)
+            {
+                if (first.Value.CompareTo(second.Value) < 0) //CompareTo accessible due to where T: IComparable
+                {
+                    if (result == null)
+                    {
+                        result = first;
+                        tail = first;
+                    }
+                    else
+                    {
+                        tail.Next = first;
+                        tail = first;
+                    }
+                    first = first.Next;
+                }
+                else
+                {
+                    if (result == null)
+                    {
+                        result = second;
+                        tail = second;
+                    }
+                    else
+                    {
+                        tail.Next = second;
+                        tail = second;
+                    }
+                    second = second.Next;
+                }
+            }
+
+            if (first != null)
+            {
+                tail.Next = first;
+                tail = first;
+            }
+            else if (second != null)
+            {
+                tail.Next = second;
+                tail = second;
+            }
+            return result;
         }
 
-        public void MergeSort(Node<T> node)
+        public void MergeSort(ref Node<T> node)
         {
-            throw new NotImplementedException();
+            if (node == null || node.Next == null)
+            {
+                return;
+            }
+            Node<T> firstHalf = null, secondHalf = null;
+            FrontBackSplit(node, ref firstHalf, ref secondHalf);
+            MergeSort(ref firstHalf);
+            MergeSort(ref secondHalf);
+            node = MergeSortedLL(firstHalf, secondHalf);
         }
 
-        public void ReverseLLInGroups(Node<T> node, int k)
+        public void FrontBackSplit(Node<T> node, ref Node<T> firstHalf, ref Node<T> secondHalf)
         {
-            throw new NotImplementedException();
+            if (node == null || node.Next == null)
+            {
+                firstHalf = node;
+                secondHalf = null;
+                return;
+            }
+            Node<T> oneMovePtr = node;
+            Node<T> twoMovePtr = node.Next;
+            while (twoMovePtr != null && twoMovePtr.Next != null)
+            {
+                twoMovePtr = twoMovePtr.Next.Next;
+                oneMovePtr = oneMovePtr.Next;
+            }
+            secondHalf = oneMovePtr.Next;
+            oneMovePtr.Next = null;
+            firstHalf = node;
+            
+        }
+
+        public void ReverseLLInGroups(ref Node<T> node, int k)
+        {
+            if (node == null)
+            {
+                return;
+            }
+            Node<T> ptr = node, result = null, resultFinal = null, save = null;
+            int ctr = 0;
+
+            while (ptr != null)
+            {
+                while (ptr != null && ctr < k)
+                {
+                    save = ptr.Next;
+                    if (result == null)
+                    {
+                        result = ptr;
+                        result.Next = null;
+                    }
+                    else
+                    {
+                        ptr.Next = result;
+                        result = ptr;
+                    }
+                    ptr = save;
+                    ctr++;
+                }
+            }
+
         }
 
         public void DeleteNodesWithGreaterValueOnRight(Node<T> node)
